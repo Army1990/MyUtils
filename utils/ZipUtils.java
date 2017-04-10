@@ -1,4 +1,4 @@
-package com.blankj.utilcode.utils;
+package com.shanpiao.common.utils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -16,6 +16,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import static com.shanpiao.common.utils.ConstUtils.KB;
+
 /**
  * <pre>
  *     author: Blankj
@@ -29,8 +31,6 @@ public class ZipUtils {
     private ZipUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
-
-    private static final int KB = 1024;
 
     /**
      * 批量压缩文件

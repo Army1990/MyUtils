@@ -1,6 +1,4 @@
-package com.blankj.utilcode.utils;
-
-import android.util.Base64;
+package com.shanpiao.common.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +12,9 @@ import java.security.SecureRandom;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
+import static com.shanpiao.common.utils.ConvertUtils.bytes2HexString;
+import static com.shanpiao.common.utils.ConvertUtils.hexString2Bytes;
 
 /**
  * <pre>
@@ -123,7 +124,7 @@ public class EncryptUtils {
      * @return 文件的16进制密文
      */
     public static String encryptMD5File2String(String filePath) {
-        File file = StringUtils.isSpace(filePath) ? null : new File(filePath);
+        File file =  StringUtils.isSpace(filePath) ? null : new File(filePath);
         return encryptMD5File2String(file);
     }
 
@@ -134,7 +135,7 @@ public class EncryptUtils {
      * @return 文件的MD5校验码
      */
     public static byte[] encryptMD5File(String filePath) {
-        File file = StringUtils.isSpace(filePath) ? null : new File(filePath);
+        File file =  StringUtils.isSpace(filePath) ? null : new File(filePath);
         return encryptMD5File(file);
     }
 
@@ -163,7 +164,7 @@ public class EncryptUtils {
             MessageDigest md = MessageDigest.getInstance("MD5");
             digestInputStream = new DigestInputStream(fis, md);
             byte[] buffer = new byte[256 * 1024];
-            while (digestInputStream.read(buffer) > 0) ;
+            while (digestInputStream.read(buffer) > 0);
             md = digestInputStream.getMessageDigest();
             return md.digest();
         } catch (NoSuchAlgorithmException | IOException e) {
@@ -580,7 +581,7 @@ public class EncryptUtils {
      * @return Base64密文
      */
     public static byte[] encryptDES2Base64(byte[] data, byte[] key) {
-        return base64Encode(encryptDES(data, key));
+        return EncodeUtils.base64Encode(encryptDES(data, key));
     }
 
     /**
@@ -613,7 +614,7 @@ public class EncryptUtils {
      * @return 明文
      */
     public static byte[] decryptBase64DES(byte[] data, byte[] key) {
-        return decryptDES(base64Decode(data), key);
+        return decryptDES(EncodeUtils.base64Decode(data), key);
     }
 
     /**
@@ -657,7 +658,7 @@ public class EncryptUtils {
      * @return Base64密文
      */
     public static byte[] encrypt3DES2Base64(byte[] data, byte[] key) {
-        return base64Encode(encrypt3DES(data, key));
+        return EncodeUtils.base64Encode(encrypt3DES(data, key));
     }
 
     /**
@@ -690,7 +691,7 @@ public class EncryptUtils {
      * @return 明文
      */
     public static byte[] decryptBase64_3DES(byte[] data, byte[] key) {
-        return decrypt3DES(base64Decode(data), key);
+        return decrypt3DES(EncodeUtils.base64Decode(data), key);
     }
 
     /**
@@ -734,7 +735,7 @@ public class EncryptUtils {
      * @return Base64密文
      */
     public static byte[] encryptAES2Base64(byte[] data, byte[] key) {
-        return base64Encode(encryptAES(data, key));
+        return EncodeUtils.base64Encode(encryptAES(data, key));
     }
 
     /**
@@ -767,7 +768,7 @@ public class EncryptUtils {
      * @return 明文
      */
     public static byte[] decryptBase64AES(byte[] data, byte[] key) {
-        return decryptAES(base64Decode(data), key);
+        return decryptAES(EncodeUtils.base64Decode(data), key);
     }
 
     /**
@@ -814,87 +815,5 @@ public class EncryptUtils {
             e.printStackTrace();
             return null;
         }
-    }
-
-    private static final char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-
-    /**
-     * byteArr转hexString
-     * <p>例如：</p>
-     * bytes2HexString(new byte[] { 0, (byte) 0xa8 }) returns 00A8
-     *
-     * @param bytes 字节数组
-     * @return 16进制大写字符串
-     */
-    private static String bytes2HexString(byte[] bytes) {
-        if (bytes == null) return null;
-        int len = bytes.length;
-        if (len <= 0) return null;
-        char[] ret = new char[len << 1];
-        for (int i = 0, j = 0; i < len; i++) {
-            ret[j++] = hexDigits[bytes[i] >>> 4 & 0x0f];
-            ret[j++] = hexDigits[bytes[i] & 0x0f];
-        }
-        return new String(ret);
-    }
-
-
-    /**
-     * hexString转byteArr
-     * <p>例如：</p>
-     * hexString2Bytes("00A8") returns { 0, (byte) 0xA8 }
-     *
-     * @param hexString 十六进制字符串
-     * @return 字节数组
-     */
-    private static byte[] hexString2Bytes(String hexString) {
-        if (StringUtils.isSpace(hexString)) return null;
-        int len = hexString.length();
-        if (len % 2 != 0) {
-            hexString = "0" + hexString;
-            len = len + 1;
-        }
-        char[] hexBytes = hexString.toUpperCase().toCharArray();
-        byte[] ret = new byte[len >> 1];
-        for (int i = 0; i < len; i += 2) {
-            ret[i >> 1] = (byte) (hex2Dec(hexBytes[i]) << 4 | hex2Dec(hexBytes[i + 1]));
-        }
-        return ret;
-    }
-
-    /**
-     * hexChar转int
-     *
-     * @param hexChar hex单个字节
-     * @return 0..15
-     */
-    private static int hex2Dec(char hexChar) {
-        if (hexChar >= '0' && hexChar <= '9') {
-            return hexChar - '0';
-        } else if (hexChar >= 'A' && hexChar <= 'F') {
-            return hexChar - 'A' + 10;
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    /**
-     * Base64编码
-     *
-     * @param input 要编码的字节数组
-     * @return Base64编码后的字符串
-     */
-    private static byte[] base64Encode(byte[] input) {
-        return Base64.encode(input, Base64.NO_WRAP);
-    }
-
-    /**
-     * Base64解码
-     *
-     * @param input 要解码的字符串
-     * @return Base64解码后的字符串
-     */
-    private static byte[] base64Decode(byte[] input) {
-        return Base64.decode(input, Base64.NO_WRAP);
     }
 }

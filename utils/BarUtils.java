@@ -1,4 +1,4 @@
-package com.blankj.utilcode.utils;
+package com.shanpiao.common.utils;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -27,7 +27,6 @@ import java.lang.reflect.Method;
  * </pre>
  */
 public class BarUtils {
-
     private BarUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
@@ -326,9 +325,8 @@ public class BarUtils {
     /**
      * 为 DrawerLayout 布局设置状态栏透明
      *
-     * @param activity       需要设置的activity
-     * @param drawerLayout   DrawerLayout
-     * @param statusBarAlpha 透明度
+     * @param activity     需要设置的activity
+     * @param drawerLayout DrawerLayout
      */
     public static void setTranslucentForDrawerLayout(Activity activity, DrawerLayout drawerLayout, int statusBarAlpha) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
@@ -621,7 +619,7 @@ public class BarUtils {
     /*--------------------------------old--------------------------------*/
 
     /**
-     * 设置透明状态栏（api大于19方可使用）
+     * 设置透明状态栏(api大于19方可使用)
      * <p>可在Activity的onCreat()中调用</p>
      * <p>需在顶部控件布局中加入以下属性让内容出现在状态栏之下</p>
      * <p>android:clipToPadding="true"</p>

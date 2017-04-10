@@ -1,4 +1,4 @@
-package com.blankj.utilcode.utils;
+package com.shanpiao.common.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -36,7 +36,7 @@ public class AppUtils {
      * @return {@code true}: 已安装<br>{@code false}: 未安装
      */
     public static boolean isInstallApp(Context context, String packageName) {
-        return !StringUtils.isSpace(packageName) && IntentUtils.getLaunchAppIntent(packageName) != null;
+        return !StringUtils.isSpace(packageName) && IntentUtils.getLaunchAppIntent(context, packageName) != null;
     }
 
     /**
@@ -50,7 +50,7 @@ public class AppUtils {
     }
 
     /**
-     * 安装App（支持6.0）
+     * 安装App(支持6.0)
      *
      * @param context 上下文
      * @param file    文件
@@ -61,7 +61,7 @@ public class AppUtils {
     }
 
     /**
-     * 安装App（支持6.0）
+     * 安装App(支持6.0)
      *
      * @param activity    activity
      * @param filePath    文件路径
@@ -87,14 +87,15 @@ public class AppUtils {
      * 静默安装App
      * <p>非root需添加权限 {@code <uses-permission android:name="android.permission.INSTALL_PACKAGES" />}</p>
      *
+     * @param context  上下文
      * @param filePath 文件路径
      * @return {@code true}: 安装成功<br>{@code false}: 安装失败
      */
-    public static boolean installAppSilent(String filePath) {
+    public static boolean installAppSilent(Context context, String filePath) {
         File file = FileUtils.getFileByPath(filePath);
         if (!FileUtils.isFileExists(file)) return false;
         String command = "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm install " + filePath;
-        ShellUtils.CommandResult commandResult = ShellUtils.execCmd(command, !isSystemApp(Utils.getContext()), true);
+        ShellUtils.CommandResult commandResult = ShellUtils.execCmd(command, !isSystemApp(context), true);
         return commandResult.successMsg != null && commandResult.successMsg.toLowerCase().contains("success");
     }
 
@@ -157,11 +158,12 @@ public class AppUtils {
     /**
      * 打开App
      *
+     * @param context     上下文
      * @param packageName 包名
      */
-    public static void launchApp(String packageName) {
+    public static void launchApp(Context context, String packageName) {
         if (StringUtils.isSpace(packageName)) return;
-        Utils.getContext().startActivity(IntentUtils.getLaunchAppIntent(packageName));
+        context.startActivity(IntentUtils.getLaunchAppIntent(context, packageName));
     }
 
     /**
@@ -173,7 +175,7 @@ public class AppUtils {
      */
     public static void launchApp(Activity activity, String packageName, int requestCode) {
         if (StringUtils.isSpace(packageName)) return;
-        activity.startActivityForResult(IntentUtils.getLaunchAppIntent(packageName), requestCode);
+        activity.startActivityForResult(IntentUtils.getLaunchAppIntent(activity, packageName), requestCode);
     }
 
     /**
@@ -493,7 +495,7 @@ public class AppUtils {
      * @return {@code true}: 是<br>{@code false}: 否
      */
     public static boolean isAppForeground(Context context, String packageName) {
-        return !StringUtils.isSpace(packageName) && packageName.equals(ProcessUtils.getForegroundProcessName());
+        return !StringUtils.isSpace(packageName) && packageName.equals(ProcessUtils.getForegroundProcessName(context));
     }
 
     /**
@@ -681,21 +683,22 @@ public class AppUtils {
         for (String dirPath : dirPaths) {
             dirs[i++] = new File(dirPath);
         }
-        return cleanAppData(dirs);
+        return cleanAppData(context, dirs);
     }
 
     /**
      * 清除App所有数据
      *
-     * @param dirs 目录
+     * @param context 上下文
+     * @param dirs    目录
      * @return {@code true}: 成功<br>{@code false}: 失败
      */
-    public static boolean cleanAppData(File... dirs) {
-        boolean isSuccess = CleanUtils.cleanInternalCache();
-        isSuccess &= CleanUtils.cleanInternalDbs();
-        isSuccess &= CleanUtils.cleanInternalSP();
-        isSuccess &= CleanUtils.cleanInternalFiles();
-        isSuccess &= CleanUtils.cleanExternalCache();
+    public static boolean cleanAppData(Context context, File... dirs) {
+        boolean isSuccess = CleanUtils.cleanInternalCache(context);
+        isSuccess &= CleanUtils.cleanInternalDbs(context);
+        isSuccess &= CleanUtils.cleanInternalSP(context);
+        isSuccess &= CleanUtils.cleanInternalFiles(context);
+        isSuccess &= CleanUtils.cleanExternalCache(context);
         for (File dir : dirs) {
             isSuccess &= CleanUtils.cleanCustomCache(dir);
         }

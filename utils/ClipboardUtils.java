@@ -1,4 +1,4 @@
-package com.blankj.utilcode.utils;
+package com.shanpiao.common.utils;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -23,23 +23,25 @@ public class ClipboardUtils {
     /**
      * 复制文本到剪贴板
      *
-     * @param text 文本
+     * @param context 上下文
+     * @param text    文本
      */
-    public static void copyText(CharSequence text) {
-        ClipboardManager clipboard = (ClipboardManager) Utils.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+    public static void copyText(Context context, CharSequence text) {
+        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         clipboard.setPrimaryClip(ClipData.newPlainText("text", text));
     }
 
     /**
      * 获取剪贴板的文本
      *
+     * @param context 上下文
      * @return 剪贴板的文本
      */
-    public static CharSequence getText() {
-        ClipboardManager clipboard = (ClipboardManager) Utils.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+    public static CharSequence getText(Context context) {
+        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = clipboard.getPrimaryClip();
         if (clip != null && clip.getItemCount() > 0) {
-            return clip.getItemAt(0).coerceToText(Utils.getContext());
+            return clip.getItemAt(0).coerceToText(context);
         }
         return null;
     }
@@ -47,20 +49,22 @@ public class ClipboardUtils {
     /**
      * 复制uri到剪贴板
      *
-     * @param uri uri
+     * @param context 上下文
+     * @param uri     uri
      */
-    public static void copyUri(Uri uri) {
-        ClipboardManager clipboard = (ClipboardManager) Utils.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        clipboard.setPrimaryClip(ClipData.newUri(Utils.getContext().getContentResolver(), "uri", uri));
+    public static void copyUri(Context context, Uri uri) {
+        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        clipboard.setPrimaryClip(ClipData.newUri(context.getContentResolver(), "uri", uri));
     }
 
     /**
      * 获取剪贴板的uri
      *
+     * @param context 上下文
      * @return 剪贴板的uri
      */
-    public static Uri getUri() {
-        ClipboardManager clipboard = (ClipboardManager) Utils.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+    public static Uri getUri(Context context) {
+        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = clipboard.getPrimaryClip();
         if (clip != null && clip.getItemCount() > 0) {
             return clip.getItemAt(0).getUri();
@@ -71,20 +75,22 @@ public class ClipboardUtils {
     /**
      * 复制意图到剪贴板
      *
-     * @param intent 意图
+     * @param context 上下文
+     * @param intent  意图
      */
-    public static void copyIntent(Intent intent) {
-        ClipboardManager clipboard = (ClipboardManager) Utils.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+    public static void copyIntent(Context context, Intent intent) {
+        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         clipboard.setPrimaryClip(ClipData.newIntent("intent", intent));
     }
 
     /**
      * 获取剪贴板的意图
      *
+     * @param context 上下文
      * @return 剪贴板的意图
      */
-    public static Intent getIntent() {
-        ClipboardManager clipboard = (ClipboardManager) Utils.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+    public static Intent getIntent(Context context) {
+        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = clipboard.getPrimaryClip();
         if (clip != null && clip.getItemCount() > 0) {
             return clip.getItemAt(0).getIntent();

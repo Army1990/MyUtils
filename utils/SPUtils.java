@@ -1,4 +1,4 @@
-package com.blankj.utilcode.utils;
+package com.shanpiao.common.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -22,10 +22,11 @@ public class SPUtils {
      * SPUtils构造函数
      * <p>在Application中初始化</p>
      *
+     * @param context 上下文
      * @param spName  spName
      */
-    public SPUtils(String spName) {
-        sp = Utils.getContext().getSharedPreferences(spName, Context.MODE_PRIVATE);
+    public SPUtils(Context context, String spName) {
+        sp = context.getSharedPreferences(spName, Context.MODE_PRIVATE);
         editor = sp.edit();
         editor.apply();
     }
@@ -36,7 +37,7 @@ public class SPUtils {
      * @param key   键
      * @param value 值
      */
-    public void put(String key, String value) {
+    public void putString(String key, String value) {
         editor.putString(key, value).apply();
     }
 
@@ -67,7 +68,7 @@ public class SPUtils {
      * @param key   键
      * @param value 值
      */
-    public void put(String key, int value) {
+    public void putInt(String key, int value) {
         editor.putInt(key, value).apply();
     }
 
@@ -98,7 +99,7 @@ public class SPUtils {
      * @param key   键
      * @param value 值
      */
-    public void put(String key, long value) {
+    public void putLong(String key, long value) {
         editor.putLong(key, value).apply();
     }
 
@@ -129,7 +130,7 @@ public class SPUtils {
      * @param key   键
      * @param value 值
      */
-    public void put(String key, float value) {
+    public void putFloat(String key, float value) {
         editor.putFloat(key, value).apply();
     }
 
@@ -160,7 +161,7 @@ public class SPUtils {
      * @param key   键
      * @param value 值
      */
-    public void put(String key, boolean value) {
+    public void putBoolean(String key, boolean value) {
         editor.putBoolean(key, value).apply();
     }
 

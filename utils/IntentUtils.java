@@ -1,4 +1,4 @@
-package com.blankj.utilcode.utils;
+package com.shanpiao.common.utils;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
 import android.webkit.MimeTypeMap;
 
 import java.io.File;
@@ -27,7 +26,7 @@ public class IntentUtils {
     }
 
     /**
-     * 获取安装App（支持6.0）的意图
+     * 获取安装App(支持6.0)的意图
      *
      * @param filePath 文件路径
      * @return intent
@@ -46,16 +45,10 @@ public class IntentUtils {
         if (file == null) return null;
         Intent intent = new Intent(Intent.ACTION_VIEW);
         String type;
-
         if (Build.VERSION.SDK_INT < 23) {
             type = "application/vnd.android.package-archive";
         } else {
             type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(FileUtils.getFileExtension(file));
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            Uri contentUri = FileProvider.getUriForFile(Utils.getContext(), "com.your.package.fileProvider", file);
-            intent.setDataAndType(contentUri, type);
         }
         intent.setDataAndType(Uri.fromFile(file), type);
         return intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -76,11 +69,12 @@ public class IntentUtils {
     /**
      * 获取打开App的意图
      *
+     * @param context     上下文
      * @param packageName 包名
      * @return intent
      */
-    public static Intent getLaunchAppIntent(String packageName) {
-        return Utils.getContext().getPackageManager().getLaunchIntentForPackage(packageName);
+    public static Intent getLaunchAppIntent(Context context, String packageName) {
+        return context.getPackageManager().getLaunchIntentForPackage(packageName);
     }
 
     /**
@@ -183,41 +177,6 @@ public class IntentUtils {
         Intent intent = new Intent(Intent.ACTION_SHUTDOWN);
         return intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     }
-
-    /**
-     * 获取跳至拨号界面意图
-     *
-     * @param phoneNumber 电话号码
-     */
-    public static Intent getDialIntent(String phoneNumber) {
-        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phoneNumber));
-        return intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    }
-
-    /**
-     * 获取拨打电话意图
-     * <p>需添加权限 {@code <uses-permission android:name="android.permission.CALL_PHONE"/>}</p>
-     *
-     * @param phoneNumber 电话号码
-     */
-    public static Intent getCallIntent(String phoneNumber) {
-        Intent intent = new Intent("android.intent.action.CALL", Uri.parse("tel:" + phoneNumber));
-        return intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    }
-
-    /**
-     * 获取跳至发送短信界面的意图
-     *
-     * @param phoneNumber 接收号码
-     * @param content     短信内容
-     */
-    public static Intent getSendSmsIntent(String phoneNumber, String content) {
-        Uri uri = Uri.parse("smsto:" + phoneNumber);
-        Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
-        intent.putExtra("sms_body", content);
-        return intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    }
-
 
     /**
      * 获取拍照的意图

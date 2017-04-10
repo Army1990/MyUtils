@@ -1,9 +1,10 @@
-package com.blankj.utilcode.utils;
+package com.shanpiao.common.utils;
 
+import android.content.Context;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
 
 /**
  * <pre>
@@ -22,44 +23,48 @@ public class SizeUtils {
     /**
      * dp转px
      *
+     * @param context 上下文
      * @param dpValue dp值
      * @return px值
      */
-    public static int dp2px(float dpValue) {
-        final float scale = Utils.getContext().getResources().getDisplayMetrics().density;
+    public static int dp2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
 
     /**
      * px转dp
      *
+     * @param context 上下文
      * @param pxValue px值
      * @return dp值
      */
-    public static int px2dp( float pxValue) {
-        final float scale = Utils.getContext().getResources().getDisplayMetrics().density;
+    public static int px2dp(Context context, float pxValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5f);
     }
 
     /**
      * sp转px
      *
+     * @param context 上下文
      * @param spValue sp值
      * @return px值
      */
-    public static int sp2px(float spValue) {
-        final float fontScale = Utils.getContext().getResources().getDisplayMetrics().scaledDensity;
+    public static int sp2px(Context context, float spValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         return (int) (spValue * fontScale + 0.5f);
     }
 
     /**
      * px转sp
      *
+     * @param context 上下文
      * @param pxValue px值
      * @return sp值
      */
-    public static int px2sp( float pxValue) {
-        final float fontScale = Utils.getContext().getResources().getDisplayMetrics().scaledDensity;
+    public static int px2sp(Context context, float pxValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         return (int) (pxValue / fontScale + 0.5f);
     }
 
@@ -91,7 +96,7 @@ public class SizeUtils {
     }
 
     /**
-     * 在onCreate中获取视图的尺寸
+     * 在onCreate()即可强行获取View的尺寸
      * <p>需回调onGetSizeListener接口，在onGetSize中获取view宽高</p>
      * <p>用法示例如下所示</p>
      * <pre>
@@ -124,49 +129,37 @@ public class SizeUtils {
         void onGetSize(View view);
     }
 
+    public static void setListener(onGetSizeListener listener) {
+        mListener = listener;
+    }
+
+    private static onGetSizeListener mListener;
+
     /**
-     * 测量视图尺寸
+     * ListView中提前测量View尺寸，如headerView
+     * <p>用的时候去掉注释拷贝到ListView中即可</p>
+     * <p>参照以下注释代码</p>
      *
      * @param view 视图
-     * @return arr[0]: 视图宽度, arr[1]: 视图高度
      */
-    public static int[] measureView(View view) {
-        ViewGroup.LayoutParams lp = view.getLayoutParams();
-        if (lp == null) {
-            lp = new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
+    public static void measureViewInLV(View view) {
+        Log.d("tips", "U should copy the following code.");
+        /*
+        ViewGroup.LayoutParams p = view.getLayoutParams();
+        if (p == null) {
+            p = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
         }
-        int widthSpec = ViewGroup.getChildMeasureSpec(0, 0, lp.width);
-        int lpHeight = lp.height;
-        int heightSpec;
-        if (lpHeight > 0) {
-            heightSpec = View.MeasureSpec.makeMeasureSpec(lpHeight, View.MeasureSpec.EXACTLY);
+        int width = ViewGroup.getChildMeasureSpec(0, 0, p.width);
+        int height;
+        int tempHeight = p.height;
+        if (tempHeight > 0) {
+            height = MeasureSpec.makeMeasureSpec(tempHeight,
+                    MeasureSpec.EXACTLY);
         } else {
-            heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+            height = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
         }
-        view.measure(widthSpec, heightSpec);
-        return new int[]{view.getMeasuredWidth(), view.getMeasuredHeight()};
-    }
-
-    /**
-     * 获取测量视图宽度
-     *
-     * @param view 视图
-     * @return 视图宽度
-     */
-    public static int getMeasuredWidth(View view) {
-        return measureView(view)[0];
-    }
-
-    /**
-     * 获取测量视图高度
-     *
-     * @param view 视图
-     * @return 视图高度
-     */
-    public static int getMeasuredHeight(View view) {
-        return measureView(view)[1];
+        view.measure(width, height);
+        */
     }
 }

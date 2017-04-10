@@ -1,4 +1,4 @@
-package com.blankj.utilcode.utils;
+package com.shanpiao.common.utils;
 
 import android.app.Activity;
 import android.app.KeyguardManager;
@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.Surface;
 import android.view.View;
@@ -27,24 +26,26 @@ public class ScreenUtils {
     }
 
     /**
-     * 获取屏幕的宽度（单位：px）
+     * 获取屏幕的宽度px
      *
+     * @param context 上下文
      * @return 屏幕宽px
      */
-    public static int getScreenWidth() {
-        WindowManager windowManager = (WindowManager) Utils.getContext().getSystemService(Context.WINDOW_SERVICE);
+    public static int getScreenWidth(Context context) {
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics dm = new DisplayMetrics();// 创建了一张白纸
         windowManager.getDefaultDisplay().getMetrics(dm);// 给白纸设置宽高
         return dm.widthPixels;
     }
 
     /**
-     * 获取屏幕的高度（单位：px）
+     * 获取屏幕的高度px
      *
+     * @param context 上下文
      * @return 屏幕高px
      */
-    public static int getScreenHeight() {
-        WindowManager windowManager = (WindowManager) Utils.getContext().getSystemService(Context.WINDOW_SERVICE);
+    public static int getScreenHeight(Context context) {
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics dm = new DisplayMetrics();// 创建了一张白纸
         windowManager.getDefaultDisplay().getMetrics(dm);// 给白纸设置宽高
         return dm.heightPixels;
@@ -76,19 +77,21 @@ public class ScreenUtils {
     /**
      * 判断是否横屏
      *
+     * @param context 上下文
      * @return {@code true}: 是<br>{@code false}: 否
      */
-    public static boolean isLandscape() {
-        return Utils.getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+    public static boolean isLandscape(Context context) {
+        return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
     /**
      * 判断是否竖屏
      *
+     * @param context 上下文
      * @return {@code true}: 是<br>{@code false}: 否
      */
-    public static boolean isPortrait() {
-        return Utils.getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+    public static boolean isPortrait(Context context) {
+        return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
     }
 
     /**
@@ -151,34 +154,12 @@ public class ScreenUtils {
     /**
      * 判断是否锁屏
      *
+     * @param context 上下文
      * @return {@code true}: 是<br>{@code false}: 否
      */
-    public static boolean isScreenLock() {
-        KeyguardManager km = (KeyguardManager) Utils.getContext().getSystemService(Context.KEYGUARD_SERVICE);
+    public static boolean isScreenLock(Context context) {
+        KeyguardManager km = (KeyguardManager) context
+                .getSystemService(Context.KEYGUARD_SERVICE);
         return km.inKeyguardRestrictedInputMode();
-    }
-
-    /**
-     * 设置进入休眠时长
-     * <p>需添加权限 {@code <uses-permission android:name="android.permission.WRITE_SETTINGS" />}</p>
-     *
-     * @param duration 时长
-     */
-    public static void setSleepDuration(int duration) {
-        Settings.System.putInt(Utils.getContext().getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, duration);
-    }
-
-    /**
-     * 获取进入休眠时长
-     *
-     * @return 进入休眠时长，报错返回-123
-     */
-    public static int getSleepDuration() {
-        try {
-            return Settings.System.getInt(Utils.getContext().getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT);
-        } catch (Settings.SettingNotFoundException e) {
-            e.printStackTrace();
-            return -123;
-        }
     }
 }

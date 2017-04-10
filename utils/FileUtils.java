@@ -1,12 +1,9 @@
-package com.blankj.utilcode.utils;
-
-import android.annotation.SuppressLint;
+package com.shanpiao.common.utils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,6 +21,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static com.shanpiao.common.utils.ConvertUtils.bytes2HexString;
+
 
 /**
  * <pre>
@@ -145,7 +145,7 @@ public class FileUtils {
     /**
      * 判断目录是否存在，不存在则判断是否创建成功
      *
-     * @param dirPath 目录路径
+     * @param dirPath 文件路径
      * @return {@code true}: 存在或创建成功<br>{@code false}: 不存在或创建失败
      */
     public static boolean createOrExistsDir(String dirPath) {
@@ -505,13 +505,10 @@ public class FileUtils {
      * @return 文件链表
      */
     public static List<File> listFilesInDir(File dir, boolean isRecursive) {
-        if (!isDir(dir)) return null;
         if (isRecursive) return listFilesInDir(dir);
+        if (dir == null || !isDir(dir)) return null;
         List<File> list = new ArrayList<>();
-        File[] files = dir.listFiles();
-        if (files != null && files.length != 0) {
-            Collections.addAll(list, files);
-        }
+        Collections.addAll(list, dir.listFiles());
         return list;
     }
 
@@ -532,7 +529,7 @@ public class FileUtils {
      * @return 文件链表
      */
     public static List<File> listFilesInDir(File dir) {
-        if (!isDir(dir)) return null;
+        if (dir == null || !isDir(dir)) return null;
         List<File> list = new ArrayList<>();
         File[] files = dir.listFiles();
         if (files != null && files.length != 0) {
@@ -804,7 +801,7 @@ public class FileUtils {
     }
 
     /**
-     * 指定编码按行读取文件到链表中
+     * 指定编码按行读取文件到List
      *
      * @param filePath    文件路径
      * @param charsetName 编码格式
@@ -815,7 +812,7 @@ public class FileUtils {
     }
 
     /**
-     * 指定编码按行读取文件到链表中
+     * 指定编码按行读取文件到List
      *
      * @param file        文件
      * @param charsetName 编码格式
@@ -826,7 +823,7 @@ public class FileUtils {
     }
 
     /**
-     * 指定编码按行读取文件到链表中
+     * 指定编码按行读取文件到List
      *
      * @param filePath    文件路径
      * @param st          需要读取的开始行数
@@ -840,7 +837,7 @@ public class FileUtils {
     }
 
     /**
-     * 指定编码按行读取文件到链表中
+     * 指定编码按行读取文件到List
      *
      * @param file        文件
      * @param st          需要读取的开始行数
@@ -936,32 +933,11 @@ public class FileUtils {
     public static byte[] readFile2Bytes(File file) {
         if (file == null) return null;
         try {
-            return inputStream2Bytes(new FileInputStream(file));
+            return ConvertUtils.inputStream2Bytes(new FileInputStream(file));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return null;
         }
-    }
-
-    /**
-     * 获取文件最后修改的毫秒时间戳
-     *
-     * @param filePath 文件路径
-     * @return 文件最后修改的毫秒时间戳
-     */
-    public static long getFileLastModified(String filePath) {
-        return getFileLastModified(getFileByPath(filePath));
-    }
-
-    /**
-     * 获取文件最后修改的毫秒时间戳
-     *
-     * @param file 文件
-     * @return 文件最后修改的毫秒时间戳
-     */
-    public static long getFileLastModified(File file) {
-        if (file == null) return -1;
-        return file.lastModified();
     }
 
     /**
@@ -1040,27 +1016,6 @@ public class FileUtils {
     }
 
     /**
-     * 获取目录大小
-     *
-     * @param dirPath 目录路径
-     * @return 文件大小
-     */
-    public static String getDirSize(String dirPath) {
-        return getDirSize(getFileByPath(dirPath));
-    }
-
-    /**
-     * 获取目录大小
-     *
-     * @param dir 目录
-     * @return 文件大小
-     */
-    public static String getDirSize(File dir) {
-        long len = getDirLength(dir);
-        return len == -1 ? "" : byte2FitMemorySize(len);
-    }
-
-    /**
      * 获取文件大小
      *
      * @param filePath 文件路径
@@ -1077,61 +1032,8 @@ public class FileUtils {
      * @return 文件大小
      */
     public static String getFileSize(File file) {
-        long len = getFileLength(file);
-        return len == -1 ? "" : byte2FitMemorySize(len);
-    }
-
-    /**
-     * 获取目录长度
-     *
-     * @param dirPath 目录路径
-     * @return 文件大小
-     */
-    public static long getDirLength(String dirPath) {
-        return getDirLength(getFileByPath(dirPath));
-    }
-
-    /**
-     * 获取目录长度
-     *
-     * @param dir 目录
-     * @return 文件大小
-     */
-    public static long getDirLength(File dir) {
-        if (!isDir(dir)) return -1;
-        long len = 0;
-        File[] files = dir.listFiles();
-        if (files != null && files.length != 0) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    len += getDirLength(file);
-                } else {
-                    len += file.length();
-                }
-            }
-        }
-        return len;
-    }
-
-    /**
-     * 获取文件长度
-     *
-     * @param filePath 文件路径
-     * @return 文件大小
-     */
-    public static long getFileLength(String filePath) {
-        return getFileLength(getFileByPath(filePath));
-    }
-
-    /**
-     * 获取文件长度
-     *
-     * @param file 文件
-     * @return 文件大小
-     */
-    public static long getFileLength(File file) {
-        if (!isFile(file)) return -1;
-        return file.length();
+        if (!isFileExists(file)) return "";
+        return ConvertUtils.byte2FitSize(file.length());
     }
 
     /**
@@ -1290,86 +1192,5 @@ public class FileUtils {
         int lastSep = filePath.lastIndexOf(File.separator);
         if (lastPoi == -1 || lastSep >= lastPoi) return "";
         return filePath.substring(lastPoi + 1);
-    }
-
-    /** copy from ConvertUtils **/
-
-    /**
-     * inputStream转byteArr
-     *
-     * @param is 输入流
-     * @return 字节数组
-     */
-    private static byte[] inputStream2Bytes(InputStream is) {
-        if (is == null) return null;
-        return input2OutputStream(is).toByteArray();
-    }
-
-    /**
-     * inputStream转outputStream
-     *
-     * @param is 输入流
-     * @return outputStream子类
-     */
-    private static ByteArrayOutputStream input2OutputStream(InputStream is) {
-        if (is == null) return null;
-        try {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            byte[] b = new byte[ConstUtils.KB];
-            int len;
-            while ((len = is.read(b, 0, ConstUtils.KB)) != -1) {
-                os.write(b, 0, len);
-            }
-            return os;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            CloseUtils.closeIO(is);
-        }
-    }
-
-    private static final char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-
-    /**
-     * byteArr转hexString
-     * <p>例如：</p>
-     * bytes2HexString(new byte[] { 0, (byte) 0xa8 }) returns 00A8
-     *
-     * @param bytes 字节数组
-     * @return 16进制大写字符串
-     */
-    private static String bytes2HexString(byte[] bytes) {
-        if (bytes == null) return null;
-        int len = bytes.length;
-        if (len <= 0) return null;
-        char[] ret = new char[len << 1];
-        for (int i = 0, j = 0; i < len; i++) {
-            ret[j++] = hexDigits[bytes[i] >>> 4 & 0x0f];
-            ret[j++] = hexDigits[bytes[i] & 0x0f];
-        }
-        return new String(ret);
-    }
-
-    /**
-     * 字节数转合适内存大小
-     * <p>保留3位小数</p>
-     *
-     * @param byteNum 字节数
-     * @return 合适内存大小
-     */
-    @SuppressLint("DefaultLocale")
-    private static String byte2FitMemorySize(long byteNum) {
-        if (byteNum < 0) {
-            return "shouldn't be less than zero!";
-        } else if (byteNum < ConstUtils.KB) {
-            return String.format("%.3fB", (double) byteNum + 0.0005);
-        } else if (byteNum < ConstUtils.MB) {
-            return String.format("%.3fKB", (double) byteNum / ConstUtils.KB + 0.0005);
-        } else if (byteNum < ConstUtils.GB) {
-            return String.format("%.3fMB", (double) byteNum / ConstUtils.MB + 0.0005);
-        } else {
-            return String.format("%.3fGB", (double) byteNum / ConstUtils.GB + 0.0005);
-        }
     }
 }

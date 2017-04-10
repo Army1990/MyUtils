@@ -1,6 +1,6 @@
-package com.blankj.utilcode.utils;
+package com.shanpiao.common.utils;
 
-import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,7 +16,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Locale;
 
+import static com.shanpiao.common.utils.ConstUtils.BYTE;
+import static com.shanpiao.common.utils.ConstUtils.GB;
+import static com.shanpiao.common.utils.ConstUtils.KB;
+import static com.shanpiao.common.utils.ConstUtils.MB;
 /**
  * <pre>
  *     author: Blankj
@@ -31,7 +36,7 @@ public class ConvertUtils {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
 
-    private static final char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+    static final char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     /**
      * byteArr转hexString
@@ -126,39 +131,10 @@ public class ConvertUtils {
     }
 
     /**
-     * 以unit为单位的内存大小转字节数
-     *
-     * @param memorySize 大小
-     * @param unit       单位类型
-     *                   <ul>
-     *                   <li>{@link ConstUtils.MemoryUnit#BYTE}: 字节</li>
-     *                   <li>{@link ConstUtils.MemoryUnit#KB}  : 千字节</li>
-     *                   <li>{@link ConstUtils.MemoryUnit#MB}  : 兆</li>
-     *                   <li>{@link ConstUtils.MemoryUnit#GB}  : GB</li>
-     *                   </ul>
-     * @return 字节数
-     */
-    public static long memorySize2Byte(long memorySize, ConstUtils.MemoryUnit unit) {
-        if (memorySize < 0) return -1;
-        switch (unit) {
-            default:
-            case BYTE:
-                return memorySize;
-            case KB:
-                return memorySize * ConstUtils.KB;
-            case MB:
-                return memorySize * ConstUtils.MB;
-            case GB:
-                return memorySize * ConstUtils.GB;
-        }
-    }
-
-    /**
-     * 字节数转以unit为单位的内存大小
+     * 字节数转以unit为单位的size
      *
      * @param byteNum 字节数
-     * @param unit    单位类型
-     *                <ul>
+     * @param unit    <ul>
      *                <li>{@link ConstUtils.MemoryUnit#BYTE}: 字节</li>
      *                <li>{@link ConstUtils.MemoryUnit#KB}  : 千字节</li>
      *                <li>{@link ConstUtils.MemoryUnit#MB}  : 兆</li>
@@ -166,134 +142,67 @@ public class ConvertUtils {
      *                </ul>
      * @return 以unit为单位的size
      */
-    public static double byte2MemorySize(long byteNum, ConstUtils.MemoryUnit unit) {
+    public static double byte2Size(long byteNum, ConstUtils.MemoryUnit unit) {
         if (byteNum < 0) return -1;
         switch (unit) {
             default:
             case BYTE:
-                return (double) byteNum;
+                return (double) byteNum / BYTE;
             case KB:
-                return (double) byteNum / ConstUtils.KB;
+                return (double) byteNum / KB;
             case MB:
-                return (double) byteNum / ConstUtils.MB;
+                return (double) byteNum / MB;
             case GB:
-                return (double) byteNum / ConstUtils.GB;
+                return (double) byteNum / GB;
         }
     }
 
     /**
-     * 字节数转合适内存大小
+     * 以unit为单位的size转字节数
+     *
+     * @param size 大小
+     * @param unit <ul>
+     *             <li>{@link ConstUtils.MemoryUnit#BYTE}: 字节</li>
+     *             <li>{@link ConstUtils.MemoryUnit#KB}  : 千字节</li>
+     *             <li>{@link ConstUtils.MemoryUnit#MB}  : 兆</li>
+     *             <li>{@link ConstUtils.MemoryUnit#GB}  : GB</li>
+     *             </ul>
+     * @return 字节数
+     */
+    public static long size2Byte(long size, ConstUtils.MemoryUnit unit) {
+        if (size < 0) return -1;
+        switch (unit) {
+            default:
+            case BYTE:
+                return size * BYTE;
+            case KB:
+                return size * KB;
+            case MB:
+                return size * MB;
+            case GB:
+                return size * GB;
+        }
+    }
+
+    /**
+     * 字节数转合适大小
      * <p>保留3位小数</p>
      *
      * @param byteNum 字节数
-     * @return 合适内存大小
+     * @return 1...1024 unit
      */
-    @SuppressLint("DefaultLocale")
-    public static String byte2FitMemorySize(long byteNum) {
+    public static String byte2FitSize(long byteNum) {
         if (byteNum < 0) {
             return "shouldn't be less than zero!";
-        } else if (byteNum < ConstUtils.KB) {
-            return String.format("%.3fB", (double) byteNum + 0.0005);
-        } else if (byteNum < ConstUtils.MB) {
-            return String.format("%.3fKB", (double) byteNum / ConstUtils.KB + 0.0005);
-        } else if (byteNum < ConstUtils.GB) {
-            return String.format("%.3fMB", (double) byteNum / ConstUtils.MB + 0.0005);
+        } else if (byteNum < KB) {
+            return String.format(Locale.getDefault(), "%.3fB", (double) byteNum);
+        } else if (byteNum < MB) {
+            return String.format(Locale.getDefault(), "%.3fKB", (double) byteNum / KB);
+        } else if (byteNum < GB) {
+            return String.format(Locale.getDefault(), "%.3fMB", (double) byteNum / MB);
         } else {
-            return String.format("%.3fGB", (double) byteNum / ConstUtils.GB + 0.0005);
+            return String.format(Locale.getDefault(), "%.3fGB", (double) byteNum / GB);
         }
-    }
-
-    /**
-     * 以unit为单位的时间长度转毫秒时间戳
-     *
-     * @param timeSpan 毫秒时间戳
-     * @param unit     单位类型
-     *                 <ul>
-     *                 <li>{@link ConstUtils.TimeUnit#MSEC}: 毫秒</li>
-     *                 <li>{@link ConstUtils.TimeUnit#SEC }: 秒</li>
-     *                 <li>{@link ConstUtils.TimeUnit#MIN }: 分</li>
-     *                 <li>{@link ConstUtils.TimeUnit#HOUR}: 小时</li>
-     *                 <li>{@link ConstUtils.TimeUnit#DAY }: 天</li>
-     *                 </ul>
-     * @return 毫秒时间戳
-     */
-    public static long timeSpan2Millis(long timeSpan, ConstUtils.TimeUnit unit) {
-        switch (unit) {
-            default:
-            case MSEC:
-                return timeSpan;
-            case SEC:
-                return timeSpan * ConstUtils.SEC;
-            case MIN:
-                return timeSpan * ConstUtils.MIN;
-            case HOUR:
-                return timeSpan * ConstUtils.HOUR;
-            case DAY:
-                return timeSpan * ConstUtils.DAY;
-        }
-    }
-
-    /**
-     * 毫秒时间戳转以unit为单位的时间长度
-     *
-     * @param millis 毫秒时间戳
-     * @param unit   单位类型
-     *               <ul>
-     *               <li>{@link ConstUtils.TimeUnit#MSEC}: 毫秒</li>
-     *               <li>{@link ConstUtils.TimeUnit#SEC }: 秒</li>
-     *               <li>{@link ConstUtils.TimeUnit#MIN }: 分</li>
-     *               <li>{@link ConstUtils.TimeUnit#HOUR}: 小时</li>
-     *               <li>{@link ConstUtils.TimeUnit#DAY }: 天</li>
-     *               </ul>
-     * @return 以unit为单位的时间长度
-     */
-    public static long millis2TimeSpan(long millis, ConstUtils.TimeUnit unit) {
-        switch (unit) {
-            default:
-            case MSEC:
-                return millis;
-            case SEC:
-                return millis / ConstUtils.SEC;
-            case MIN:
-                return millis / ConstUtils.MIN;
-            case HOUR:
-                return millis / ConstUtils.HOUR;
-            case DAY:
-                return millis / ConstUtils.DAY;
-        }
-    }
-
-    /**
-     * 毫秒时间戳转合适时间长度
-     *
-     * @param millis    毫秒时间戳
-     *                  <p>小于等于0，返回null</p>
-     * @param precision 精度
-     *                  <ul>
-     *                  <li>precision = 0，返回null</li>
-     *                  <li>precision = 1，返回天</li>
-     *                  <li>precision = 2，返回天和小时</li>
-     *                  <li>precision = 3，返回天、小时和分钟</li>
-     *                  <li>precision = 4，返回天、小时、分钟和秒</li>
-     *                  <li>precision &gt;= 5，返回天、小时、分钟、秒和毫秒</li>
-     *                  </ul>
-     * @return 合适时间长度
-     */
-    @SuppressLint("DefaultLocale")
-    public static String millis2FitTimeSpan(long millis, int precision) {
-        if (millis <= 0 || precision <= 0) return null;
-        StringBuilder sb = new StringBuilder();
-        String[] units = {"天", "小时", "分钟", "秒", "毫秒"};
-        int[] unitLen = {86400000, 3600000, 60000, 1000, 1};
-        precision = Math.min(precision, 5);
-        for (int i = 0; i < precision; i++) {
-            if (millis >= unitLen[i]) {
-                long mode = millis / unitLen[i];
-                millis -= mode * unitLen[i];
-                sb.append(mode).append(units[i]);
-            }
-        }
-        return sb.toString();
     }
 
     /**
@@ -348,9 +257,9 @@ public class ConvertUtils {
         if (is == null) return null;
         try {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            byte[] b = new byte[ConstUtils.KB];
+            byte[] b = new byte[KB];
             int len;
-            while ((len = is.read(b, 0, ConstUtils.KB)) != -1) {
+            while ((len = is.read(b, 0, KB)) != -1) {
                 os.write(b, 0, len);
             }
             return os;
@@ -568,9 +477,9 @@ public class ConvertUtils {
      * @param view 视图
      * @return bitmap
      */
-    public static Bitmap view2Bitmap(View view) {
+    public static Bitmap view2Bitmap(Context context,View view) {
         if (view == null) return null;
-        Bitmap ret = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap ret = Bitmap.createBitmap(ScreenUtils.getScreenWidth(context), ScreenUtils.getScreenHeight(context), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(ret);
         Drawable bgDrawable = view.getBackground();
         if (bgDrawable != null) {
@@ -585,44 +494,49 @@ public class ConvertUtils {
     /**
      * dp转px
      *
+     * @param context 上下文
      * @param dpValue dp值
      * @return px值
      */
-    public static int dp2px(float dpValue) {
-        final float scale = Utils.getContext().getResources().getDisplayMetrics().density;
+    public static int dp2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
 
     /**
      * px转dp
      *
+     * @param context 上下文
      * @param pxValue px值
      * @return dp值
      */
-    public static int px2dp(float pxValue) {
-        final float scale = Utils.getContext().getResources().getDisplayMetrics().density;
+    public static int px2dp(Context context, float pxValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5f);
     }
 
     /**
      * sp转px
      *
+     * @param context 上下文
      * @param spValue sp值
      * @return px值
      */
-    public static int sp2px(float spValue) {
-        final float fontScale = Utils.getContext().getResources().getDisplayMetrics().scaledDensity;
+    public static int sp2px(Context context, float spValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         return (int) (spValue * fontScale + 0.5f);
     }
 
     /**
      * px转sp
      *
+     * @param context 上下文
      * @param pxValue px值
      * @return sp值
      */
-    public static int px2sp(float pxValue) {
-        final float fontScale = Utils.getContext().getResources().getDisplayMetrics().scaledDensity;
+    public static int px2sp(Context context, float pxValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         return (int) (pxValue / fontScale + 0.5f);
     }
+
 }

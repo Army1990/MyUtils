@@ -1,4 +1,4 @@
-package com.blankj.utilcode.utils;
+package com.shanpiao.common.utils;
 
 import android.os.Build;
 import android.text.Html;
@@ -143,7 +143,7 @@ public class EncodeUtils {
      * @param input 要Html编码的字符串
      * @return Html编码后的字符串
      */
-    public static String htmlEncode(CharSequence input) {
+    public static String htmlEncode(String input) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             return Html.escapeHtml(input);
         } else {
@@ -188,12 +188,7 @@ public class EncodeUtils {
      * @param input 待解码的字符串
      * @return Html解码后的字符串
      */
-    @SuppressWarnings("deprecation")
-    public static CharSequence htmlDecode(String input) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return Html.fromHtml(input, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            return Html.fromHtml(input);
-        }
+    public static String htmlDecode(String input) {
+        return Html.fromHtml(input).toString();
     }
 }

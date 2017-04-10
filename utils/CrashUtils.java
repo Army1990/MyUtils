@@ -1,5 +1,6 @@
-package com.blankj.utilcode.utils;
+package com.shanpiao.common.utils;
 
+import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -22,17 +23,14 @@ import java.util.Locale;
  *     desc  : 崩溃相关工具类
  * </pre>
  */
-public class CrashUtils
-        implements Thread.UncaughtExceptionHandler {
+public class CrashUtils implements UncaughtExceptionHandler {
 
-    private volatile static CrashUtils mInstance;
-
-    private UncaughtExceptionHandler mHandler;
-
-    private boolean mInitialized;
-    private String  crashDir;
-    private String  versionName;
-    private int     versionCode;
+    private static CrashUtils mInstance = new CrashUtils();
+    private        UncaughtExceptionHandler mHandler;
+    private        boolean                  mInitialized;
+    private static String                   crashDir;
+    private        String                   versionName;
+    private        int                      versionCode;
 
     private CrashUtils() {
     }
@@ -40,39 +38,28 @@ public class CrashUtils
     /**
      * 获取单例
      * <p>在Application中初始化{@code CrashUtils.getInstance().init(this);}</p>
-     * <p>需添加权限 {@code <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>}</p>
      *
      * @return 单例
      */
     public static CrashUtils getInstance() {
-        if (mInstance == null) {
-            synchronized (CrashUtils.class) {
-                if (mInstance == null) {
-                    mInstance = new CrashUtils();
-                }
-            }
-        }
         return mInstance;
     }
 
     /**
      * 初始化
      *
+     * @param context 上下文
      * @return {@code true}: 成功<br>{@code false}: 失败
      */
-    public boolean init() {
+    public boolean init(Context context) {
         if (mInitialized) return true;
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            File baseCache = Utils.getContext().getExternalCacheDir();
-            if (baseCache == null) return false;
-            crashDir = baseCache.getPath() + File.separator + "crash" + File.separator;
+            crashDir = context.getExternalCacheDir().getPath() + File.separator + "crash" + File.separator;
         } else {
-            File baseCache = Utils.getContext().getCacheDir();
-            if (baseCache == null) return false;
-            crashDir = baseCache.getPath() + File.separator + "crash" + File.separator;
+            crashDir = context.getCacheDir().getPath() + File.separator + "crash" + File.separator;
         }
         try {
-            PackageInfo pi = Utils.getContext().getPackageManager().getPackageInfo(Utils.getContext().getPackageName(), 0);
+            PackageInfo pi = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             versionName = pi.versionName;
             versionCode = pi.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
@@ -85,30 +72,25 @@ public class CrashUtils
     }
 
     @Override
-    public void uncaughtException(Thread thread, final Throwable throwable) {
+    public void uncaughtException(Thread thread, Throwable throwable) {
         String now = new SimpleDateFormat("yy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-        final String fullPath = crashDir + now + ".txt";
-        if (!createOrExistsFile(fullPath)) return;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                PrintWriter pw = null;
-                try {
-                    pw = new PrintWriter(new FileWriter(fullPath, false));
-                    pw.write(getCrashHead());
-                    throwable.printStackTrace(pw);
-                    Throwable cause = throwable.getCause();
-                    while (cause != null) {
-                        cause.printStackTrace(pw);
-                        cause = cause.getCause();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    CloseUtils.closeIO(pw);
-                }
+        String fullPath = crashDir + now + ".txt";
+        if (!FileUtils.createOrExistsFile(fullPath)) return;
+        PrintWriter pw = null;
+        try {
+            pw = new PrintWriter(new FileWriter(fullPath, false));
+            pw.write(getCrashHead());
+            throwable.printStackTrace(pw);
+            Throwable cause = throwable.getCause();
+            while (cause != null) {
+                cause.printStackTrace(pw);
+                cause = cause.getCause();
             }
-        }).start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            CloseUtils.closeIO(pw);
+        }
         if (mHandler != null) {
             mHandler.uncaughtException(thread, throwable);
         }
@@ -128,36 +110,5 @@ public class CrashUtils
                 "\nApp VersionName    : " + versionName +
                 "\nApp VersionCode    : " + versionCode +
                 "\n************* Crash Log Head ****************\n\n";
-    }
-
-    /**
-     * 判断文件是否存在，不存在则判断是否创建成功
-     *
-     * @param filePath 文件路径
-     * @return {@code true}: 存在或创建成功<br>{@code false}: 不存在或创建失败
-     */
-    private static boolean createOrExistsFile(String filePath) {
-        File file = new File(filePath);
-        // 如果存在，是文件则返回true，是目录则返回false
-        if (file.exists()) return file.isFile();
-        if (!createOrExistsDir(file.getParentFile())) return false;
-        try {
-            return file.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-
-    /**
-     * 判断目录是否存在，不存在则判断是否创建成功
-     *
-     * @param file 文件
-     * @return {@code true}: 存在或创建成功<br>{@code false}: 不存在或创建失败
-     */
-    private static boolean createOrExistsDir(File file) {
-        // 如果存在，是目录则返回true，是文件则返回false，不存在则返回是否创建成功
-        return file != null && (file.exists() ? file.isDirectory() : file.mkdirs());
     }
 }

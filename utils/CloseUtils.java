@@ -1,8 +1,7 @@
-package com.blankj.utilcode.utils;
+package com.shanpiao.common.utils;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.net.Socket;
 
 /**
  * <pre>
